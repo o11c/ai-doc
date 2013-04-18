@@ -7,6 +7,7 @@ import java.util.Map;
 public class PerceptronStrategy implements Strategy
 {
     Map<String, Map<String, Integer>> knowledge = new HashMap<String, Map<String, Integer>>();
+    Map<String, Map.Entry<String, Integer>[]> cache = null;
 
     public void train(String[] body, String cat)
     {
@@ -25,10 +26,15 @@ public class PerceptronStrategy implements Strategy
             value++;
             ck.put(s, value);
         }
+        cache = null;
     }
 
-    public String test(String[] body)
+    private void update_cache()
     {
+        if (cache != null)
+            return;
+        cache = new HashMap<String, Map.Entry<String, Integer>[]>();
+
         for (Map.Entry<String, Map<String, Integer>> oe : knowledge.entrySet())
         {
             String key = oe.getKey();
@@ -46,7 +52,12 @@ public class PerceptronStrategy implements Strategy
             Map.Entry<String, Integer>[] best = new Map.Entry/*<String, Integer>*/[Math.min(20, list.size())];
             for (Map.Entry<String, Integer> ie : list)
                 best[i++] = ie;
+            cache.put(key, best);
         }
+    }
+
+    public String test(String[] body)
+    {
         return null;
     }
 }
