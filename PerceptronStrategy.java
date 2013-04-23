@@ -2,62 +2,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class PerceptronStrategy implements Strategy
+public class PerceptronStrategy extends AbstractBagStrategy
 {
-    Map<String, Map<String, Integer>> knowledge = new HashMap<String, Map<String, Integer>>();
-    Map<String, Map.Entry<String, Integer>[]> cache = null;
-
-    public void train(String[] body, String cat)
+    static class CategoryKnowledge extends AbstractBagStrategy.AbstractKnowledge
     {
-        Map<String, Integer> ck = knowledge.get(cat);
-        if (ck == null)
+        double test(String[] body)
         {
-            ck = new HashMap<String, Integer>();
-            knowledge.put(cat, ck);
-        }
-
-        for (String s : body)
-        {
-            Integer value = ck.get(s);
-            if (value == null)
-                value = 0;
-            value++;
-            ck.put(s, value);
-        }
-        cache = null;
-    }
-
-    private void update_cache()
-    {
-        if (cache != null)
-            return;
-        cache = new HashMap<String, Map.Entry<String, Integer>[]>();
-
-        for (Map.Entry<String, Map<String, Integer>> oe : knowledge.entrySet())
-        {
-            String key = oe.getKey();
-            ArrayList<Map.Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(oe.getValue().entrySet());
-            Collections.sort(list, new Comparator<Map.Entry<String, Integer>>()
-                    {
-                        public int compare(Map.Entry<String, Integer> l, Map.Entry<String, Integer> r)
-                        {
-                            // reversed comparison
-                            return l.getValue() - r.getValue();
-                        }
-                    });
-            // stupid Java
-            int i = 0;
-            Map.Entry<String, Integer>[] best = new Map.Entry/*<String, Integer>*/[Math.min(20, list.size())];
-            for (Map.Entry<String, Integer> ie : list)
-                best[i++] = ie;
-            cache.put(key, best);
+            return 0.0;
         }
     }
 
-    public String test(String[] body)
+    protected CategoryKnowledge new_CategoryKnowledge()
     {
-        return null;
+        return new CategoryKnowledge();
     }
 }
