@@ -216,7 +216,7 @@ public class Main {
 
 
                 Map<String,String> naive = new HashMap<String,String>();
-		naiveBayes(deedsoftrustfiles,deedsofreconveyancefiles,liensfiles,testingfiles,testingfilesnames,naive);
+		NaiveBayes.naiveBayes(deedsoftrustfiles,deedsofreconveyancefiles,liensfiles,testingfiles,testingfilesnames,naive);
 
 		for(int i = 0; i < testingfiles.length; i++){
 			String result = main.IntelliGrep(testingfiles[i]);

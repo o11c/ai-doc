@@ -7,12 +7,12 @@ public class NaiveBayes {
 	/**
 	 * @param args
 	 */
-	class pair{
+	static class pair{
 		public String name;
 		public float val;
 	}
 
-	protected void naiveBayes(String[] dt, String[] dr, String[] l, String[] test,File[] testnames, Map<String,String> results){
+	public static void naiveBayes(String[] dt, String[] dr, String[] l, String[] test,File[] testnames, Map<String,String> results){
 		pair[] DTFeature = featureSet(dt);
 		pair[] DRFeature = featureSet(dr);
 		pair[] LFeature = featureSet(l);
@@ -66,7 +66,7 @@ public class NaiveBayes {
 		}
 
 	}
-	protected void probInc(Map<String,Double> a, int j, pair[] feature,String key, Map<String,Double> prob){
+	static protected void probInc(Map<String,Double> a, int j, pair[] feature,String key, Map<String,Double> prob){
 		Double val = a.get(key);
 		if(val == null){ val = 0.0;}
 		Double probVal = prob.get(feature[j].name);
@@ -74,7 +74,7 @@ public class NaiveBayes {
 		a.put(key, val);
 	}
 
-	protected void docBools(Map<String,Double> a, String[] docs,pair[] feature,String ckey){
+	static protected void docBools(Map<String,Double> a, String[] docs,pair[] feature,String ckey){
 		Map<String, Integer> bools = new HashMap<String, Integer>();
 
 		for(int i = 0; i < docs.length; i++){
@@ -107,7 +107,7 @@ public class NaiveBayes {
 		double cProbability = a.get(ckey) / docNum;
 		a.put(ckey, cProbability);
 	}
-	private void inc(Map<String, Integer> c, String key)
+	static private void inc(Map<String, Integer> c, String key)
     {
         Integer value = c.get(key);
         if (value == null)
@@ -116,7 +116,7 @@ public class NaiveBayes {
         c.put(key, value);
     }
 
-	protected pair[] featureSet(String[] allDocs){
+	static protected pair[] featureSet(String[] allDocs){
 		Map<String, Integer> dict = new HashMap<String, Integer>(); //The Hashmap that stores key and value pair
 		int totalWords = 0; 	//Holds the total number of words in all documents
 
@@ -141,6 +141,7 @@ public class NaiveBayes {
 		pair[] arr = new pair[dict.size()]; //Create the array of classes so that name/val pairs can be sorted
 		int index = 0;
 		for(String key : dict.keySet()){
+			arr[index] = new pair();
 			arr[index].name = key;
 			arr[index].val = dict.get(key) / totalWords;
 			index++;
@@ -162,7 +163,7 @@ public class NaiveBayes {
 				}
 			}
 		}
-		pair[] feature = new pair[20];
+		pair[] feature = new pair[Math.min(20, arr.length)];
 		for(int k = 0; k < feature.length; k++){
 			feature[k] = arr[k];
 		}
