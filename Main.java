@@ -5,15 +5,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class Main {
-	
+
 
 	public String preprocessFile(File f){
 
@@ -74,9 +74,9 @@ public class Main {
 		}
 
 		String[] r = new String[results.size()];
-		
+
 		results.toArray(r);
-		
+
 		return r;
 	}
 
@@ -104,7 +104,7 @@ public class Main {
 			lcount++;
 		}
 
-		Hashtable<String, Integer> d = new Hashtable<String, Integer>();		
+		Hashtable<String, Integer> d = new Hashtable<String, Integer>();
 		d.put("deed of trust", dtcount);
 		d.put("deed of reconveyance", drcount);
 		d.put("lien", lcount);
@@ -193,7 +193,7 @@ public class Main {
 			deedsoftrustfiles = main.preprocessing(deedsoftrust);
 			File dir = new File(deedsoftrust);
 			deedsoftrustfilesnames = dir.listFiles();
-			
+
 		}
 
 		if(!deedsofreconveyance.isEmpty()){
@@ -201,25 +201,27 @@ public class Main {
 			File dir = new File(deedsofreconveyance);
 			deedsofreconveyancefilesnames = dir.listFiles();
 		}
-		
+
 		if(!liens.isEmpty()){
 			liensfiles = main.preprocessing(liens);
 			File dir = new File(liens);
 			liensfilesnames = dir.listFiles();
 		}
-		
+
 		if(!testing.isEmpty()){
 			testingfiles = main.preprocessing(testing);
 			File dir = new File(testing);
 			testingfilesnames = dir.listFiles();
 		}
-		
+
+
+                Map<String,String> naive = new HashMap<String,String>();
+		naiveBayes(deedsoftrustfiles,deedsofreconveyancefiles,liensfiles,testingfiles,testingfilesnames,naive);
 
 		for(int i = 0; i < testingfiles.length; i++){
 			String result = main.IntelliGrep(testingfiles[i]);
 			System.out.println("Intelli-Grep, " + testingfilesnames[i].getName() + ", " + result);
+			System.out.println("Naive Bayes, " + testingfilesnames[i].getName() + ", " + naive.get(testingfilesnames[i].getName()));
 		}
-		
 	}
-
 }
