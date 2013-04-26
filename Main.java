@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.regex.Pattern;
 
 
 public class Main {
-
+	
 
 	public String preprocessFile(File f){
 
@@ -72,7 +73,11 @@ public class Main {
 			}
 		}
 
-		return (String[]) results.toArray();
+		String[] r = new String[results.size()];
+		
+		results.toArray(r);
+		
+		return r;
 	}
 
 
@@ -103,7 +108,7 @@ public class Main {
 		d.put("deed of trust", dtcount);
 		d.put("deed of reconveyance", drcount);
 		d.put("lien", lcount);
-		
+
 		ArrayList<String> maxkeys = new ArrayList<String>();
 		int max = 0;
 		for(Map.Entry<String, Integer> entry : d.entrySet()){
@@ -118,11 +123,11 @@ public class Main {
 		}
 
 		Random r = new Random();
-		
+
 		int index = r.nextInt(maxkeys.size());
-		
+
 		return maxkeys.get(index);
-		
+
 	}
 
 
@@ -131,17 +136,90 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
-		if(args.length != 4){
-			System.err.println("Incorrect Number of Arguments!");
-			System.exit(1);
+
+		Main main = new Main();
+
+		String deedsoftrust = "", deedsofreconveyance = "", liens = "", testing = "", output = "";
+		String[] deedsoftrustfiles = null, deedsofreconveyancefiles = null, liensfiles = null, testingfiles = null;
+		File[] deedsoftrustfilesnames = null, deedsofreconveyancefilesnames = null, liensfilesnames = null, testingfilesnames = null;
+
+		BufferedReader s = new BufferedReader(new InputStreamReader(System.in));/* Reads in the users input */
+
+		System.out.println("Please enter the path for the Deeds of Trust training data:");
+
+		try {
+			deedsoftrust = s.readLine();
+		} catch (IOException e) {
+			System.err.println("ERROR! INPUT ERROR FOR DEEDS OF TRUST PATH! " + e);
+		}
+
+		System.out.println("Please enter the path for the Deeds of Reconveyance training data:");
+
+		try {
+			deedsofreconveyance = s.readLine();
+		} catch (IOException e) {
+			System.err.println("ERROR! INPUT ERROR FOR DEEDS OF RECONVEYANCE PATH! " + e);
+
+		}
+
+		System.out.println("Please enter the path for the Liens training data:");
+
+		try {
+			liens = s.readLine();
+		} catch (IOException e) {
+			System.err.println("ERROR! INPUT ERROR FOR LIENS PATH! " + e);
+
+		}
+
+		System.out.println("Please enter the path for the Testing data:");
+
+		try {
+			testing = s.readLine();
+		} catch (IOException e) {
+			System.err.println("ERROR! INPUT ERROR FOR TESTING PATH! " + e);
+
+		}
+
+		System.out.println("Please enter the name of the Output file:");
+
+		try {
+			output = s.readLine();
+		} catch (IOException e) {
+			System.err.println("ERROR! INPUT ERROR FOR OUTPUT FILE NAME! " + e);
+
+		}
+
+		if(!deedsoftrust.isEmpty()){
+			deedsoftrustfiles = main.preprocessing(deedsoftrust);
+			File dir = new File(deedsoftrust);
+			deedsoftrustfilesnames = dir.listFiles();
+			
+		}
+
+		if(!deedsofreconveyance.isEmpty()){
+			deedsofreconveyancefiles = main.preprocessing(deedsofreconveyance);
+			File dir = new File(deedsofreconveyance);
+			deedsofreconveyancefilesnames = dir.listFiles();
 		}
 		
-		for(int i = 0; i < args.length; i++){
-			System.out.println(args[i]);
+		if(!liens.isEmpty()){
+			liensfiles = main.preprocessing(liens);
+			File dir = new File(liens);
+			liensfilesnames = dir.listFiles();
+		}
+		
+		if(!testing.isEmpty()){
+			testingfiles = main.preprocessing(testing);
+			File dir = new File(testing);
+			testingfilesnames = dir.listFiles();
 		}
 		
 
+		for(int i = 0; i < testingfiles.length; i++){
+			String result = main.IntelliGrep(testingfiles[i]);
+			System.out.println("Intelli-Grep, " + testingfilesnames[i].getName() + ", " + result);
+		}
+		
 	}
 
 }
