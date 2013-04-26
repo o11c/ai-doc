@@ -92,7 +92,7 @@ public abstract class AbstractBagStrategy implements Strategy
         abstract double test(String[] body);
     }
 
-    private Map<String, AbstractKnowledge> knowledge = new HashMap<String, AbstractKnowledge>();
+    protected Map<String, AbstractKnowledge> knowledge = new HashMap<String, AbstractKnowledge>();
 
     protected abstract AbstractKnowledge new_CategoryKnowledge();
 
@@ -108,7 +108,7 @@ public abstract class AbstractBagStrategy implements Strategy
         ck.train(body);
     }
 
-    Set<String> features = null;
+    protected Set<String> features = null;
 
     protected void update_cache()
     {
