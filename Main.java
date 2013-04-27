@@ -3,10 +3,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -14,241 +17,81 @@ import java.util.regex.Pattern;
 
 public class Main
 {
-    public String preprocessFile(File f)
+    static class IO
     {
-        String inputText = "";
-        BufferedReader reader = null;
+        BufferedReader in;
+        PrintStream out;
+        IO(InputStream in, PrintStream out)
+        {
+            this.in = new BufferedReader(new InputStreamReader(in));
+            this.out = out;
+        }
 
-        try
+        String input(String p, String d)
         {
-            reader = new BufferedReader(new FileReader(f));
-            String text = null;
-
-            while((text = reader.readLine()) != null)
-            {
-                inputText.concat(text);
-            }
-        }
-        catch(FileNotFoundException e)
-        {
-            System.err.println(e);
-        }
-        catch (IOException e)
-        {
-            System.err.println(e);
-        }
-        finally
-        {
+            out.println(p + "(default: " + d + ")");
+            String o = null;
             try
             {
-                if(reader != null)
-                {
-                    reader.close();
-                }
+                o = in.readLine();
             }
-            catch(IOException e)
+            catch (IOException e)
             {
-                System.err.println(e);
             }
+            if (o == null || o.isEmpty())
+                o = d;
+            return o;
         }
-
-        StringBuffer s = new StringBuffer();
-
-        for(int i = 0; i < inputText.length(); i++)
-        {
-            char c = inputText.charAt(i);
-            if(Character.isLetter(c))
-            {
-                s.append(c);
-            }
-        }
-
-        String result = s.toString();
-        result = result.toLowerCase();
-        result = result.trim().replaceAll(" +", " ");
-        return result;
     }
 
-    public String[] preprocessing(String path)
+    static void do_train(List<Driver> drivers, File catdir, String catname)
     {
-        File dir = new File(path);
-        File[] files = dir.listFiles();
-        ArrayList<String> results = new ArrayList<String>();
-
-        for(int i = 0; i < files.length; i++)
-        {
-            if(files[i].isFile())
-            {
-                results.add(preprocessFile(files[i]));
-            }
-        }
-
-        String[] r = new String[results.size()];
-        results.toArray(r);
-        return r;
+        // TODO: don't reopen the file for every driver
+        for (File f : catdir.listFiles())
+            if (f.isFile())
+                for (Driver d : drivers)
+                    d.train(f, catname);
     }
 
-    public String IntelliGrep(String s)
+    static void do_test(List<Driver> drivers, File catdir)
     {
-        Pattern dt = Pattern.compile("deed of trust");
-        Pattern dr = Pattern.compile("deed of reconveyance");
-        Pattern l = Pattern.compile("lien");
-        int lcount = 0;
-        int dtcount = 0;
-        int drcount = 0;
-
-        Matcher dtmatch = dt.matcher(s);
-        Matcher drmatch = dr.matcher(s);
-        Matcher lmatch = l.matcher(s);
-
-        while(dtmatch.find())
-        {
-            dtcount++;
-        }
-        while(drmatch.find())
-        {
-            drcount++;
-        }
-        while(lmatch.find())
-        {
-            lcount++;
-        }
-
-        Hashtable<String, Integer> d = new Hashtable<String, Integer>();
-        d.put("deed of trust", dtcount);
-        d.put("deed of reconveyance", drcount);
-        d.put("lien", lcount);
-
-        ArrayList<String> maxkeys = new ArrayList<String>();
-        int max = 0;
-        for(Map.Entry<String, Integer> entry : d.entrySet())
-        {
-            if(entry.getValue() > max)
-            {
-                max = entry.getValue();
-                maxkeys.clear();
-                maxkeys.add(entry.getKey());
-            }
-            else if(entry.getValue() == max)
-            {
-                maxkeys.add(entry.getKey());
-            }
-        }
-
-        Random r = new Random();
-
-        int index = r.nextInt(maxkeys.size());
-
-        return maxkeys.get(index);
-
+        for (File f : catdir.listFiles())
+            if (f.isFile())
+                for (Driver d : drivers)
+                    d.test(f);
     }
 
     public static void main(String[] args)
     {
-        Main main = new Main();
+        File deedsoftrust, deedsofreconveyance, liens, testing, output;
 
-        String deedsoftrust = "", deedsofreconveyance = "", liens = "", testing = "", output = "";
-        String[] deedsoftrustfiles = null, deedsofreconveyancefiles = null, liensfiles = null, testingfiles = null;
-        File[] deedsoftrustfilesnames = null, deedsofreconveyancefilesnames = null, liensfilesnames = null, testingfilesnames = null;
-
-        BufferedReader s = new BufferedReader(new InputStreamReader(System.in));/* Reads in the users input */
-
-        System.out.println("Please enter the path for the Deeds of Trust training data:");
-
-        try
         {
-            deedsoftrust = s.readLine();
-        }
-        catch (IOException e)
-        {
-            System.err.println("ERROR! INPUT ERROR FOR DEEDS OF TRUST PATH! " + e);
+            IO io = new IO(System.in, System.out);
+
+            deedsoftrust = new File(io.input("Path for the Deeds of Trust training data: ", "data/DT"));
+            deedsofreconveyance = new File(io.input("Path for the Deeds of Reconveyance training data: ", "data/DR"));
+            liens = new File(io.input("Path for the Liens training data: ", "data/L"));
+            testing = new File(io.input("Path for the Testing data: ", "data/TEST"));
+            output = new File(io.input("Directory for the Output files: ", "test-results"));
         }
 
-        System.out.println("Please enter the path for the Deeds of Reconveyance training data:");
+        List<Driver> drivers = new ArrayList<Driver>();
+        for (Preprocessor pp : new Preprocessor[]{new LittlePreprocessor()})
+            for (Strategy s : new Strategy[]{new IntelliGrepStrategy()})
+            {
+                String name = pp.getClass().getName() + "-" + s.getClass().getName() + ".txt";
+                drivers.add(new Driver(new File(output, name), pp, s));
+            }
 
-        try
-        {
-            deedsofreconveyance = s.readLine();
-        }
-        catch (IOException e)
-        {
-            System.err.println("ERROR! INPUT ERROR FOR DEEDS OF RECONVEYANCE PATH! " + e);
-        }
+        System.out.println("Training deeds of trust ...");
+        do_train(drivers, deedsoftrust, "DT");
+        System.out.println("Training deeds of reconveyance...");
+        do_train(drivers, deedsofreconveyance, "DR");
+        System.out.println("Training liens ...");
+        do_train(drivers, liens, "L");
 
-        System.out.println("Please enter the path for the Liens training data:");
-
-        try
-        {
-            liens = s.readLine();
-        }
-        catch (IOException e)
-        {
-            System.err.println("ERROR! INPUT ERROR FOR LIENS PATH! " + e);
-
-        }
-
-        System.out.println("Please enter the path for the Testing data:");
-
-        try
-        {
-            testing = s.readLine();
-        }
-        catch (IOException e)
-        {
-            System.err.println("ERROR! INPUT ERROR FOR TESTING PATH! " + e);
-
-        }
-
-        System.out.println("Please enter the name of the Output file:");
-
-        try
-        {
-            output = s.readLine();
-        }
-        catch (IOException e)
-        {
-            System.err.println("ERROR! INPUT ERROR FOR OUTPUT FILE NAME! " + e);
-
-        }
-
-        if(!deedsoftrust.isEmpty())
-        {
-            deedsoftrustfiles = main.preprocessing(deedsoftrust);
-            File dir = new File(deedsoftrust);
-            deedsoftrustfilesnames = dir.listFiles();
-
-        }
-
-        if(!deedsofreconveyance.isEmpty())
-        {
-            deedsofreconveyancefiles = main.preprocessing(deedsofreconveyance);
-            File dir = new File(deedsofreconveyance);
-            deedsofreconveyancefilesnames = dir.listFiles();
-        }
-
-        if(!liens.isEmpty())
-        {
-            liensfiles = main.preprocessing(liens);
-            File dir = new File(liens);
-            liensfilesnames = dir.listFiles();
-        }
-
-        if(!testing.isEmpty())
-        {
-            testingfiles = main.preprocessing(testing);
-            File dir = new File(testing);
-            testingfilesnames = dir.listFiles();
-        }
-
-
-        //Map<String,String> naive = new HashMap<String,String>();
-        //NaiveBayes.naiveBayes(deedsoftrustfiles,deedsofreconveyancefiles,liensfiles,testingfiles,testingfilesnames,naive);
-
-        for(int i = 0; i < testingfiles.length; i++)
-        {
-            String result = main.IntelliGrep(testingfiles[i]);
-            System.out.println("Intelli-Grep, " + testingfilesnames[i].getName() + ", " + result);
-            //System.out.println("Naive Bayes, " + testingfilesnames[i].getName() + ", " + naive.get(testingfilesnames[i].getName()));
-        }
+        System.out.println("Doing tests now!");
+        do_test(drivers, testing);
+        System.out.println("Everything is done now ...");
     }
 }
