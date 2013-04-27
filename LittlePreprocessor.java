@@ -9,7 +9,7 @@ import java.util.List;
 public class LittlePreprocessor implements Preprocessor
 {
     @Override
-    public String[] preprocess(Reader in)
+    public List<String> preprocess(Reader in)
     {
         BufferedReader reader = new BufferedReader(in);
 
@@ -32,8 +32,6 @@ public class LittlePreprocessor implements Preprocessor
             words.addAll(Arrays.asList(lw));
         }
 
-        String[] out = new String[words.size()];
-        words.toArray(out);
-        return out;
+        return words;
     }
 }

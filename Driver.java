@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.util.List;
 
 // A combination of preprocessor and strategy
 public class Driver
@@ -26,7 +27,7 @@ public class Driver
         this.s = s;
     }
 
-    public String[] preprocess(File f)
+    public List<String> preprocess(File f)
     {
         Reader in;
         try
@@ -42,13 +43,13 @@ public class Driver
 
     public void train(File f, String c)
     {
-        String[] body = preprocess(f);
+        List<String> body = preprocess(f);
         s.train(body, c);
     }
 
     public void test(File f)
     {
-        String[] body = preprocess(f);
+        List<String> body = preprocess(f);
         String cat = s.test(body);
         out.println(f.getName() + "," + cat);
         out.flush(); // Java does not flush streams at exit?

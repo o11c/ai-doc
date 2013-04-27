@@ -6,12 +6,12 @@ public class IntelliGrepStrategy implements Strategy
 {
     Random rng = new Random();
 
-    public void train(String[] body, String cat)
+    public void train(List<String> body, String cat)
     {
         // IntelliGrep requires no training
     }
 
-    public String test(String[] body)
+    public String test(List<String> body)
     {
         int lcount = 0;
         int dtcount = 0;

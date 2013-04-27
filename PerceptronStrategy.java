@@ -8,10 +8,10 @@ public class PerceptronStrategy extends AbstractBagStrategy
 {
     static class Memory
     {
-        String[] body;
+        List<String> body;
         String cat;
 
-        Memory(String[] body, String cat)
+        Memory(List<String> body, String cat)
         {
             this.body = body;
             this.cat = cat;
@@ -51,14 +51,14 @@ public class PerceptronStrategy extends AbstractBagStrategy
                     for (String w : m.body)
                         if (e.getKey().equals(w))
                             prob++;
-                    prob /= m.body.length;
+                    prob /= m.body.size();
                     e.setValue(e.getValue() + rate * err * prob);
                 }
             }
         }
 
         @Override
-        double test(String[] body)
+        double test(List<String> body)
         {
             double sum = bias;
             for (Map.Entry<String, Double> e : weights.entrySet())
@@ -67,7 +67,7 @@ public class PerceptronStrategy extends AbstractBagStrategy
                 for (String w : body)
                     if (e.getKey().equals(w))
                         prob++;
-                prob /= body.length;
+                prob /= body.size();
                 sum += prob * e.getValue();
             }
             return sum;
@@ -85,7 +85,7 @@ public class PerceptronStrategy extends AbstractBagStrategy
     }
 
     @Override
-    public void train(String[] body, String cat)
+    public void train(List<String> body, String cat)
     {
         super.train(body, cat);
         memories.add(new Memory(body, cat));

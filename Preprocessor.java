@@ -1,6 +1,7 @@
 import java.io.Reader;
+import java.util.List;
 
 public interface Preprocessor
 {
-    String[] preprocess(Reader in);
+    List<String> preprocess(Reader in);
 }

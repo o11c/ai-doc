@@ -7,9 +7,8 @@ public class NaiveBayesStrategy extends AbstractBagStrategy
     static class CategoryKnowledge extends AbstractBagStrategy.AbstractKnowledge
     {
         @Override
-        double test(String[] d)
+        double test(List<String> dl)
         {
-            List<String> dl = Arrays.asList(d);
             double probgetval = 1.0;
             for (Map.Entry<String, Double> e : probabilities.entrySet())
             {

@@ -32,7 +32,7 @@ public abstract class AbstractBagStrategy implements Strategy
             c.put(key, value);
         }
 
-        public void train(String[] body)
+        public void train(List<String> body)
         {
             Set<String> seen = new HashSet<String>();
             for (String key : body)
@@ -44,7 +44,7 @@ public abstract class AbstractBagStrategy implements Strategy
                 inc(document_bools, key);
             }
             document_count++;
-            word_count += body.length;
+            word_count += body.size();
             probabilities = null;
         }
 
@@ -57,6 +57,7 @@ public abstract class AbstractBagStrategy implements Strategy
                         public int compare(Map.Entry<String, Integer> l, Map.Entry<String, Integer> r)
                         {
                             // really reversed comparison
+                            // it's much easier to customize operators
                             return r.getValue() - l.getValue();
                         }
                     });
@@ -91,7 +92,7 @@ public abstract class AbstractBagStrategy implements Strategy
             recache(document_bools, document_count, features);
         }
 
-        abstract double test(String[] body);
+        abstract double test(List<String> body);
     }
 
     protected Map<String, AbstractKnowledge> knowledge = new HashMap<String, AbstractKnowledge>();
@@ -99,7 +100,7 @@ public abstract class AbstractBagStrategy implements Strategy
     protected abstract AbstractKnowledge new_CategoryKnowledge();
 
     @Override
-    public void train(String[] body, String cat)
+    public void train(List<String> body, String cat)
     {
         AbstractKnowledge ck = knowledge.get(cat);
         if (ck == null)
@@ -126,7 +127,7 @@ public abstract class AbstractBagStrategy implements Strategy
     }
 
     @Override
-    public String test(String[] body)
+    public String test(List<String> body)
     {
         update_cache();
 
