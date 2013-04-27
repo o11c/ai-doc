@@ -1,8 +1,5 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,35 +32,19 @@ public class PerceptronStrategy extends AbstractBagStrategy
 
         void tick(double rate, List<Memory> mems, String identity)
         {
-            // int err = 0;
             for (Memory m : mems)
             {
-                double sum = bias;
-                for (Map.Entry<String, Double> e : weights.entrySet())
-                {
-                    double prob = 0.0;
-                    for (String w : m.body)
-                        if (e.getKey().equals(w))
-                            prob++;
-                    prob /= m.body.length;
-                    sum += prob * e.getValue();
-                }
+                double sum = test(m.body);
                 boolean thinks_it_is = sum > 0.0;
                 boolean really_is = m.cat.equals(identity);
                 int err = 0;
                 if (thinks_it_is && !really_is)
-                {
-                    err--;
-                }
+                    err = -1;
                 if (!thinks_it_is && really_is)
-                {
-                    err++;
-                }
+                    err = 1;
                 if (err == 0)
                     continue;
-            //}
-            //for (Memory m : mems)
-            //{
+
                 for (Map.Entry<String, Double> e : weights.entrySet())
                 {
                     double prob = 0.0;
@@ -76,9 +57,20 @@ public class PerceptronStrategy extends AbstractBagStrategy
             }
         }
 
+        @Override
         double test(String[] body)
         {
-            return 0.0;
+            double sum = bias;
+            for (Map.Entry<String, Double> e : weights.entrySet())
+            {
+                double prob = 0.0;
+                for (String w : body)
+                    if (e.getKey().equals(w))
+                        prob++;
+                prob /= body.length;
+                sum += prob * e.getValue();
+            }
+            return sum;
         }
     }
 
@@ -113,14 +105,20 @@ public class PerceptronStrategy extends AbstractBagStrategy
 
         int rounds = 100;
         double rate = 0.1;
+        System.out.println("Resetting perceptron. This can take a LONG time.");
+        System.out.print("P: " + rounds + " \r");
+        System.out.flush();
         while (rounds-->0)
         {
+            System.out.print("P: " + rounds + " \r");
+            System.out.flush();
             tick(rate);
             rate *= 0.99;
         }
     }
 
-    protected CategoryKnowledge new_CategoryKnowledge()
+    @Override
+    protected AbstractKnowledge new_CategoryKnowledge()
     {
         return new CategoryKnowledge();
     }

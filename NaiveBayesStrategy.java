@@ -2,7 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.*;
 
-public class NaiveBayes
+public class NaiveBayesStrategy // extends AbstractBagStrategy
 {
     static class pair
     {
@@ -78,7 +78,7 @@ public class NaiveBayes
         }
 
     }
-    static protected void probInc(Map<String,Double> a, int j, pair[] feature,String key, Map<String,Double> prob)
+    static private void probInc(Map<String,Double> a, int j, pair[] feature,String key, Map<String,Double> prob)
     {
         Double val = a.get(key);
         if(val == null){ val = 0.0;}
@@ -87,7 +87,7 @@ public class NaiveBayes
         a.put(key, val);
     }
 
-    static protected void docBools(Map<String,Double> a, String[] docs,pair[] feature,String ckey)
+    static private void docBools(Map<String,Double> a, String[] docs,pair[] feature,String ckey)
     {
         Map<String, Integer> bools = new HashMap<String, Integer>();
 
@@ -139,7 +139,7 @@ public class NaiveBayes
         c.put(key, value);
     }
 
-    static protected pair[] featureSet(String[] allDocs)
+    static private pair[] featureSet(String[] allDocs)
     {
         //The Hashmap that stores key and value pair
         Map<String, Integer> dict = new HashMap<String, Integer>();
@@ -203,10 +203,7 @@ public class NaiveBayes
             }
         }
         pair[] feature = new pair[Math.min(20, arr.length)];
-        for(int k = 0; k < feature.length; k++)
-        {
-            feature[k] = arr[k];
-        }
+        System.arraycopy(arr, 0, feature, 0, feature.length);
         return feature;
     }
 }

@@ -42,7 +42,6 @@ public class Driver
 
     public void train(File f, String c)
     {
-        System.err.println("Training " + f.getName() + " as a " + c);
         String[] body = preprocess(f);
         s.train(body, c);
     }
@@ -51,8 +50,7 @@ public class Driver
     {
         String[] body = preprocess(f);
         String cat = s.test(body);
-        System.err.println("Tested " + f.getName() + " as a " + cat);
         out.println(f.getName() + "," + cat);
-        out.flush();
+        out.flush(); // Java does not flush streams at exit?
     }
 }

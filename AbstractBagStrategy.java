@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -52,10 +53,11 @@ public abstract class AbstractBagStrategy implements Strategy
             List<Map.Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(word_counts.entrySet());
             Collections.sort(list, new Comparator<Map.Entry<String, Integer>>()
                     {
+                        @Override
                         public int compare(Map.Entry<String, Integer> l, Map.Entry<String, Integer> r)
                         {
-                            // reversed comparison
-                            return l.getValue() - r.getValue();
+                            // really reversed comparison
+                            return r.getValue() - l.getValue();
                         }
                     });
             if (list.size() > 20)
@@ -96,6 +98,7 @@ public abstract class AbstractBagStrategy implements Strategy
 
     protected abstract AbstractKnowledge new_CategoryKnowledge();
 
+    @Override
     public void train(String[] body, String cat)
     {
         AbstractKnowledge ck = knowledge.get(cat);
@@ -117,12 +120,12 @@ public abstract class AbstractBagStrategy implements Strategy
         features = new HashSet<String>();
 
         for (Map.Entry<String, AbstractKnowledge> e : knowledge.entrySet())
-            for (String word : e.getValue().most_common_words())
-                features.add(word);
+            features.addAll(Arrays.asList(e.getValue().most_common_words()));
         for (Map.Entry<String, AbstractKnowledge> e : knowledge.entrySet())
             e.getValue().recache_by_bool(features);
     }
 
+    @Override
     public String test(String[] body)
     {
         update_cache();

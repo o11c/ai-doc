@@ -8,6 +8,7 @@ import java.util.List;
 /// returns only lowercase
 public class LittlePreprocessor implements Preprocessor
 {
+    @Override
     public String[] preprocess(Reader in)
     {
         BufferedReader reader = new BufferedReader(in);
