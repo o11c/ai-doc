@@ -15,10 +15,12 @@ public class NaiveBayesStrategy extends AbstractBagStrategy
             {
                 // a feature (word)
                 String ft = e.getKey();
-                // frequency of that feature
+                // frequency of that feature, in (0, 1]
                 Double val = e.getValue();
                 if (dl.contains(ft))
-                    probgetval *= probabilities.get(ft);
+                    probgetval *= val;
+                else
+                    probgetval *= (1 - val);
             }
             return probgetval / document_count;
         }
