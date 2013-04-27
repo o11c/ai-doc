@@ -69,7 +69,12 @@ public class Main
 
         List<Driver> drivers = new ArrayList<Driver>();
         for (Preprocessor pp : new Preprocessor[]{new LittlePreprocessor()})
-            for (Strategy s : new Strategy[]{new IntelliGrepStrategy(), /*new NaiveBayesStrategy(),*/ new PerceptronStrategy()})
+            for (Strategy s : new Strategy[]
+                    {
+                        new IntelliGrepStrategy(),
+                        new NaiveBayesStrategy(),
+                        //new PerceptronStrategy()
+                    })
             {
                 String name = pp.getClass().getName() + "-" + s.getClass().getName() + ".txt";
                 drivers.add(new Driver(new File(output, name), pp, s));

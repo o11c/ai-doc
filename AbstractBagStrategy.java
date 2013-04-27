@@ -19,9 +19,9 @@ public abstract class AbstractBagStrategy implements Strategy
         // Number of words
         private int word_count = 0;
         // Number of documents
-        private int document_count = 0;
+        protected int document_count = 0;
         // Cache of word frequencies
-        private Map<String, Double> probabilities = null;
+        protected Map<String, Double> probabilities = null;
 
         private void inc(Map<String, Integer> c, String key)
         {
