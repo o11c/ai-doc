@@ -68,12 +68,16 @@ public class Main
         }
 
         List<Driver> drivers = new ArrayList<Driver>();
-        for (Preprocessor pp : new Preprocessor[]{new LittlePreprocessor()})
+        for (Preprocessor pp : new Preprocessor[]
+                {
+                    new LittlePreprocessor(),
+                    new BlacklistPreprocessor(),
+                })
             for (Strategy s : new Strategy[]
                     {
                         new IntelliGrepStrategy(),
                         new NaiveBayesStrategy(),
-                        //new PerceptronStrategy()
+                        new PerceptronStrategy(),
                     })
             {
                 String name = pp.getClass().getName() + "-" + s.getClass().getName() + ".txt";
